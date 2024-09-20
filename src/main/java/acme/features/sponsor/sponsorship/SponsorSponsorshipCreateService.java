@@ -50,6 +50,7 @@ public class SponsorSponsorshipCreateService extends AbstractService<Sponsor, Sp
 		object.setDraftMode(true);
 		object.setSponsor(sponsor);
 		object.setAmount(poor);
+		object.setMoment(MomentHelper.getCurrentMoment());
 
 		super.getBuffer().addData(object);
 	}
