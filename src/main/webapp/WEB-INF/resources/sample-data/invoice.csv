@@ -15,7 +15,7 @@ invoice-13,IN-6819-3792,2003/10/02 06:30,2019/11/15 16:45,"EUR 2,000,000",9.0,ht
 invoice-14,IN-8546-1290,2009/04/10 09:55,2020/05/25 14:20,"GBP 3,930",8.0,http://example.com/invoice/14,true,sponsorship-14,sponsor-02
 invoice-15,IN-5218-9347,2006/03/15 14:00,2019/04/30 10:10,"EUR 1,000.23",10.0,http://example.com/invoice/15,false,sponsorship-15,sponsor-02
 invoice-16,IN-2790-4673,2008/12/07 08:45,2021/01/25 12:30,"USD 2,000.23",7.0,http://example.com/invoice/16,false,sponsorship-16,sponsor-01
-invoice-17,IN-3764-8952,2009/07/20 10:25,2019/09/05 14:50,"GBP 1,000",9.0,http://example.com/invoice/17,false,sponsorship-17,sponsor-01
-invoice-18,IN-6509-3194,2009/02/05 17:35,2020/03/20 09:15,"USD 4,930",11.0,http://example.com/invoice/18,false,sponsorship-18,sponsor-02
-invoice-19,IN-8042-2635,2010/11/29 20:50,2020/01/10 11:30,"EUR 1,000.23",5.0,http://example.com/invoice/19,false,sponsorship-19,sponsor-02
-invoice-20,IN-4715-1028,2009/06/23 15:05,2020/08/05 17:40,"GBP 1,000.23",6.0,http://example.com/invoice/20,true,sponsorship-20,sponsor-01
+invoice-17,IN-3764-8952,2009/07/20 10:25,2019/09/05 14:50,"GBP 1,000",9.0,,false,sponsorship-17,sponsor-01
+invoice-18,IN-6509-3194,2009/02/05 17:35,2020/03/20 09:15,"USD 4,930",11.0,,false,sponsorship-18,sponsor-02
+invoice-19,IN-8042-2635,2010/11/29 20:50,2020/01/10 11:30,"EUR 1,000.23",5.0,null,false,sponsorship-19,sponsor-02
+invoice-20,IN-4715-1028,2009/06/23 15:05,2020/08/05 17:40,"GBP 1,000.23",6.0,null,true,sponsorship-20,sponsor-01
