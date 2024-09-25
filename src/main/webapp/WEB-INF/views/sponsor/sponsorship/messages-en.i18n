@@ -47,3 +47,4 @@ sponsor.sponsorship.form.error.negative-amount = Amount must be positive
 sponsor.sponsorship.form.error.wrong-currency = The currency must be EUR, USD or GBP
 sponsor.sponsorship.form.error.invoices-amount = Amount must be equal to the sum of the total amount of the related invoice
 sponsor.sponsorship.form.error.different-currency = You can't change the sponsorship's currency
+sponsor.sponsorship.form.error.none-invoices = There is no invoice created. Please create one and publish it before publishing the sponsorship

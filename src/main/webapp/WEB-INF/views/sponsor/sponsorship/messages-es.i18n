@@ -47,3 +47,4 @@ sponsor.sponsorship.form.error.negative-amount = La cantidad debe ser positiva
 sponsor.sponsorship.form.error.wrong-currency = La moneda debe ser EUR, USD o GBP
 sponsor.sponsorship.form.error.invoices-amount = La cantidad debe ser igual a la suma de las cantidades totales de las facturas relacionadas
 sponsor.sponsorship.form.error.different-currency = No puedes cambiar la moneda de un patrocinio
+sponsor.sponsorship.form.error.none-invoices = No hay ninguna factura creada. Por favor, crea uno y publicalo antes de publicar el patrocinio

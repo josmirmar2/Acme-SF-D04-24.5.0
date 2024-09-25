@@ -72,6 +72,8 @@ public class SponsorSponsorshipPublishService extends AbstractService<Sponsor, S
 	@Override
 	public void validate(final Sponsorship object) {
 		assert object != null;
+
+		super.state(this.repository.noneInvoicesBySponsorshipId(object.getId()), "*", "sponsor.sponsorship.form.error.none-invoices");
 		super.state(this.repository.allInvoicesPublishedBySponsorshipId(object.getId()), "*", "sponsor.sponsorship.form.error.publish-invoices");
 
 		if (!super.getBuffer().getErrors().hasErrors("code")) {
