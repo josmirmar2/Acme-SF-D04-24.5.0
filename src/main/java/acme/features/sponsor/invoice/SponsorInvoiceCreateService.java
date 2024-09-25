@@ -8,7 +8,6 @@ import org.assertj.core.util.Arrays;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import acme.client.data.datatypes.Money;
 import acme.client.data.models.Dataset;
 import acme.client.helpers.MomentHelper;
 import acme.client.services.AbstractService;
@@ -100,27 +99,7 @@ public class SponsorInvoiceCreateService extends AbstractService<Sponsor, Invoic
 	public void perform(final Invoice object) {
 		assert object != null;
 
-		Sponsorship sponsorship;
-		Double invoicesAmounts;
-		Money finalMoney;
-		String systemCurrency;
-
 		this.repository.save(object);
-
-		sponsorship = object.getSponsorship();
-
-		invoicesAmounts = this.repository.findManyInvoicesBySponsorshipId(sponsorship.getId()).stream() //
-			.mapToDouble(i -> i.totalAmount().getAmount() / this.repository.findMoneyConvertByMoneyCurrency(i.totalAmount().getCurrency())) //
-			.sum();
-
-		systemCurrency = this.repository.findSystemConfiguration().getSystemCurrency();
-
-		finalMoney = new Money();
-		finalMoney.setAmount(Math.round(invoicesAmounts * this.repository.findMoneyConvertByMoneyCurrency(systemCurrency) * 100.0) / 100.0);
-		finalMoney.setCurrency(this.repository.findSystemConfiguration().getSystemCurrency());
-
-		sponsorship.setAmount(finalMoney);
-		this.repository.save(sponsorship);
 	}
 
 	@Override

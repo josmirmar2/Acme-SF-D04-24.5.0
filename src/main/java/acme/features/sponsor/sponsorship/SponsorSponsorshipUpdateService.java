@@ -99,27 +99,19 @@ public class SponsorSponsorshipUpdateService extends AbstractService<Sponsor, Sp
 				super.state(false, "endDate", "sponsor.sponsorship.form.error.invalid-moment");
 		}
 
+		if (!super.getBuffer().getErrors().hasErrors("amount")) {
+			Money amount;
+			amount = object.getAmount();
+
+			super.state(amount.getAmount() >= 0, "amount", "sponsor.sponsorship.form.error.negative-amount");
+			super.state(amount.getCurrency().equals("EUR") || amount.getCurrency().equals("USD") || amount.getCurrency().equals("GBP"), "amount", "sponsor.sponsorship.form.error.wrong-currency");
+		}
+
 	}
 
 	@Override
 	public void perform(final Sponsorship object) {
 		assert object != null;
-
-		Double invoicesAmounts;
-		Money finalMoney;
-		String systemCurrency;
-
-		invoicesAmounts = this.repository.findManyInvoicesBySponsorshipId(object.getId()).stream() //
-			.mapToDouble(i -> i.totalAmount().getAmount() / this.repository.findMoneyConvertByMoneyCurrency(i.totalAmount().getCurrency())) //
-			.sum();
-
-		systemCurrency = this.repository.findSystemConfiguration().getSystemCurrency();
-
-		finalMoney = new Money();
-		finalMoney.setAmount(Math.round(invoicesAmounts * this.repository.findMoneyConvertByMoneyCurrency(systemCurrency) * 100.0) / 100.0);
-		finalMoney.setCurrency(this.repository.findSystemConfiguration().getSystemCurrency());
-
-		object.setAmount(finalMoney);
 
 		this.repository.save(object);
 	}

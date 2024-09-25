@@ -104,6 +104,14 @@ public class SponsorSponsorshipCreateService extends AbstractService<Sponsor, Sp
 				super.state(false, "endDate", "sponsor.sponsorship.form.error.invalid-moment");
 		}
 
+		if (!super.getBuffer().getErrors().hasErrors("amount")) {
+			Money amount;
+			amount = object.getAmount();
+
+			super.state(amount.getAmount() >= 0, "amount", "sponsor.sponsorship.form.error.negative-amount");
+			super.state(amount.getCurrency().equals("EUR") || amount.getCurrency().equals("USD") || amount.getCurrency().equals("GBP"), "amount", "sponsor.sponsorship.form.error.wrong-currency");
+		}
+
 	}
 
 	@Override

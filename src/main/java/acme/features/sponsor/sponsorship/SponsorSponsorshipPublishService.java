@@ -13,6 +13,7 @@ import acme.client.data.models.Dataset;
 import acme.client.helpers.MomentHelper;
 import acme.client.services.AbstractService;
 import acme.client.views.SelectChoices;
+import acme.entities.Invoice;
 import acme.entities.Project;
 import acme.entities.Sponsorship;
 import acme.enumerated.TypeOfSponsorship;
@@ -105,27 +106,33 @@ public class SponsorSponsorshipPublishService extends AbstractService<Sponsor, S
 			super.state(!isDraftMode, "project", "sponsor.sponsorship.form.error.not-published-project");
 		}
 
+		Collection<Invoice> invoices = this.repository.findManyInvoicesBySponsorshipId(object.getId());
+		double sumTotal = 0.0;
+		if (object.getAmount() != null) {
+			String systemCurrency;
+			for (Invoice i : invoices) {
+				systemCurrency = this.repository.findSystemConfiguration().getSystemCurrency();
+				sumTotal += i.totalAmount().getAmount() * this.repository.findMoneyConvertByMoneyCurrency(systemCurrency);
+			}
+
+			double factor = Math.pow(10, 2);
+			sumTotal = Math.round(sumTotal * factor) / factor;
+		} else
+			sumTotal = -10000.00;
+
+		if (!super.getBuffer().getErrors().hasErrors("amount")) {
+			Money amount;
+			amount = object.getAmount();
+
+			super.state(amount.getAmount() >= 0, "amount", "sponsor.sponsorship.form.error.negative-amount");
+			super.state(amount.getAmount() * this.repository.findMoneyConvertByMoneyCurrency(amount.getCurrency()) == sumTotal, "amount", "sponsor.sponsorship.form.error.invoices-amount");
+			super.state(amount.getCurrency().equals("EUR") || amount.getCurrency().equals("USD") || amount.getCurrency().equals("GBP"), "amount", "sponsor.sponsorship.form.error.wrong-currency");
+		}
 	}
 
 	@Override
 	public void perform(final Sponsorship object) {
 		assert object != null;
-
-		Double invoicesAmounts;
-		Money finalMoney;
-		String systemCurrency;
-
-		invoicesAmounts = this.repository.findManyInvoicesBySponsorshipId(object.getId()).stream() //
-			.mapToDouble(i -> i.totalAmount().getAmount() / this.repository.findMoneyConvertByMoneyCurrency(i.totalAmount().getCurrency())) //
-			.sum();
-
-		systemCurrency = this.repository.findSystemConfiguration().getSystemCurrency();
-
-		finalMoney = new Money();
-		finalMoney.setAmount(Math.round(invoicesAmounts * this.repository.findMoneyConvertByMoneyCurrency(systemCurrency) * 100.0) / 100.0);
-		finalMoney.setCurrency(this.repository.findSystemConfiguration().getSystemCurrency());
-
-		object.setAmount(finalMoney);
 		object.setDraftMode(false);
 
 		this.repository.save(object);
