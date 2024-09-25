@@ -73,8 +73,13 @@ public class SponsorSponsorshipPublishService extends AbstractService<Sponsor, S
 	public void validate(final Sponsorship object) {
 		assert object != null;
 		super.state(this.repository.allInvoicesPublishedBySponsorshipId(object.getId()), "*", "sponsor.sponsorship.form.error.publish-invoices");
-		if (!super.getBuffer().getErrors().hasErrors("code"))
-			super.state(this.repository.existsOtherByCodeAndId(object.getCode(), object.getId()), "code", "sponsor.sponsorship.form.error.duplicated");
+
+		if (!super.getBuffer().getErrors().hasErrors("code")) {
+			Sponsorship existing;
+			existing = this.repository.findOneSponsorshipByCode(object.getCode());
+
+			super.state(existing == null || existing.getId() == object.getId(), "code", "sponsor.sponsorship.form.error.duplicated");
+		}
 
 		if (!super.getBuffer().getErrors().hasErrors("startDate")) {
 			Date minimumDeadline;

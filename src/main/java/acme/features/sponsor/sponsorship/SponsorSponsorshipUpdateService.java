@@ -71,8 +71,12 @@ public class SponsorSponsorshipUpdateService extends AbstractService<Sponsor, Sp
 	@Override
 	public void validate(final Sponsorship object) {
 		assert object != null;
-		if (!super.getBuffer().getErrors().hasErrors("code"))
-			super.state(this.repository.existsOtherByCodeAndId(object.getCode(), object.getId()), "code", "sponsor.sponsorship.form.error.duplicated");
+		if (!super.getBuffer().getErrors().hasErrors("code")) {
+			Sponsorship existing;
+			existing = this.repository.findOneSponsorshipByCode(object.getCode());
+
+			super.state(existing == null || existing.getId() == object.getId(), "code", "sponsor.sponsorship.form.error.duplicated");
+		}
 
 		if (!super.getBuffer().getErrors().hasErrors("startDate")) {
 			Date minimumDeadline;
