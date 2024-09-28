@@ -86,7 +86,7 @@ public class SponsorInvoiceUpdateService extends AbstractService<Sponsor, Invoic
 
 			super.state(object.getQuantity().getAmount() > 0, "quantity", "sponsor.invoice.form.error.negative-salary");
 			super.state(Arrays.asList(this.repository.findAcceptedCurrencies().split(",")).contains(object.getQuantity().getCurrency()), "quantity", "sponsor.invoice.form.error.invalid-currency");
-			super.state(res <= object.getSponsorship().getAmount().getAmount(), "*", "sponsor.invoice.form.error.bad-total-amount");
+			super.state(res <= object.getSponsorship().getAmount().getAmount(), "quantity", "sponsor.invoice.form.error.bad-total-amount");
 		}
 	}
 
