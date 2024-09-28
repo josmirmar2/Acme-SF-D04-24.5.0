@@ -36,3 +36,5 @@ sponsor.invoice.form.error.negative-salary = La cantidad debe ser positiva
 sponsor.invoice.form.error.invalid-currency = Por favor, elige un tipo de moneda que esté en la configuración del sistema
 sponsor.invoice.form.error.to-close-from-registration = La fecha de vencimiento debe ser al menos un mes por delante del momento de inscripción
 sponsor.invoice.form.error.incorrect-registration-time = El momento de inscripción es incorrecto. Por favor, corrígelo para poder rellenar correctamente la fecha de vencimiento
+sponsor.invoice.form.error.bad-total-amount = A la hora de publicar una factura, la cantidad total de esta debe no ser superior a la del patrocinio al que pertenece
+

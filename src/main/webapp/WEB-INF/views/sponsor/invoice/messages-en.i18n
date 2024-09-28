@@ -36,3 +36,4 @@ sponsor.invoice.form.error.negative-salary = The quantity must be positive
 sponsor.invoice.form.error.invalid-currency = Please choose a currency that is in the system configuration
 sponsor.invoice.form.error.to-close-from-registration = The due date must be at least one month ahead the registration time
 sponsor.invoice.form.error.incorrect-registration-time = The registration time is incorrect. Please, correct it so that the due date value can be filled in correctly
+sponsor.invoice.form.error.bad-total-amount = When publishing an invoice, the total amount of the invoice must not be greater than that of the sponsorship to which it belongs
