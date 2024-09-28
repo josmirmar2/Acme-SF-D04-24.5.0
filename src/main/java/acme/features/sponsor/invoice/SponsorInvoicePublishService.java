@@ -66,14 +66,10 @@ public class SponsorInvoicePublishService extends AbstractService<Sponsor, Invoi
 			super.state(this.repository.existsOtherByCodeAndId(object.getCode(), object.getId()), "code", "sponsor.invoice.form.error.duplicated");
 
 		if (!super.getBuffer().getErrors().hasErrors("dueDate")) {
-			Date maximumDeadline;
+			Date minimumDeadline;
 
-			if (!super.getBuffer().getErrors().hasErrors("registrationTime")) {
-				maximumDeadline = MomentHelper.deltaFromMoment(object.getRegistrationTime(), 1, ChronoUnit.MONTHS);
-				super.state(MomentHelper.isAfter(object.getDueDate(), maximumDeadline), "dueDate", "sponsor.invoice.form.error.to-close-from-registration");
-
-			} else
-				super.state(false, "dueDate", "sponsor.invoice.form.error.incorrect-registration-time");
+			minimumDeadline = MomentHelper.deltaFromMoment(object.getRegistrationTime(), 30, ChronoUnit.DAYS);
+			super.state(MomentHelper.isAfter(object.getDueDate(), minimumDeadline), "dueDate", "sponsor.invoice.form.error.to-close-from-registration");
 		}
 
 		if (!super.getBuffer().getErrors().hasErrors("quantity")) {

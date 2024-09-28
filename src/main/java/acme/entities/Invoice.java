@@ -12,7 +12,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.PastOrPresent;
+import javax.validation.constraints.Past;
 import javax.validation.constraints.Pattern;
 
 import org.hibernate.validator.constraints.Length;
@@ -41,7 +41,7 @@ public class Invoice extends AbstractEntity {
 	@Pattern(regexp = "IN-[0-9]{4}-[0-9]{4}")
 	private String				code;
 
-	@PastOrPresent
+	@Past
 	@Temporal(TemporalType.TIMESTAMP)
 	@NotNull
 	private Date				registrationTime;
