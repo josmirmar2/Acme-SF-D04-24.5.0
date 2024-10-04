@@ -38,18 +38,12 @@ public class SponsorSponsorshipCreateService extends AbstractService<Sponsor, Sp
 	public void load() {
 		Sponsorship object;
 		Sponsor sponsor;
-		Money poor;
 
 		sponsor = this.repository.findOneSponsorById(super.getRequest().getPrincipal().getActiveRoleId());
-		poor = new Money();
-
-		poor.setAmount(0.0);
-		poor.setCurrency(this.repository.findSystemConfiguration().getSystemCurrency());
 
 		object = new Sponsorship();
 		object.setDraftMode(true);
 		object.setSponsor(sponsor);
-		object.setAmount(poor);
 		object.setMoment(MomentHelper.getCurrentMoment());
 
 		super.getBuffer().addData(object);
@@ -65,7 +59,7 @@ public class SponsorSponsorshipCreateService extends AbstractService<Sponsor, Sp
 		projectId = super.getRequest().getData("project", int.class);
 		project = this.repository.findOneProjectById(projectId);
 
-		super.bind(object, "code", "moment", "startDate", "endDate", "email", "link", "type");
+		super.bind(object, "code", "moment", "startDate", "endDate", "email", "link", "type", "amount");
 		object.setProject(project);
 	}
 
@@ -77,7 +71,7 @@ public class SponsorSponsorshipCreateService extends AbstractService<Sponsor, Sp
 			Sponsorship existing;
 			existing = this.repository.findOneSponsorshipByCode(object.getCode());
 
-			super.state(existing == null || existing.getId() == object.getId(), "code", "sponsor.sponsorship.form.error.duplicated");
+			super.state(existing == null, "code", "sponsor.sponsorship.form.error.duplicated");
 		}
 
 		if (!super.getBuffer().getErrors().hasErrors("startDate")) {
@@ -128,7 +122,7 @@ public class SponsorSponsorshipCreateService extends AbstractService<Sponsor, Sp
 		choices = SelectChoices.from(projects, "code", object.getProject());
 		choicesType = SelectChoices.from(TypeOfSponsorship.class, object.getType());
 
-		dataset = super.unbind(object, "code", "moment", "startDate", "endDate", "email", "link", "type");
+		dataset = super.unbind(object, "code", "moment", "startDate", "endDate", "email", "link", "type", "amount");
 		dataset.put("project", choices.getSelected().getKey());
 		dataset.put("projects", choices);
 		dataset.put("type", choicesType.getSelected().getKey());
