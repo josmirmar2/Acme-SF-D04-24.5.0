@@ -13,6 +13,7 @@ import acme.client.data.models.Dataset;
 import acme.client.helpers.MomentHelper;
 import acme.client.services.AbstractService;
 import acme.client.views.SelectChoices;
+import acme.entities.Invoice;
 import acme.entities.Project;
 import acme.entities.Sponsorship;
 import acme.enumerated.TypeOfSponsorship;
@@ -71,61 +72,67 @@ public class SponsorSponsorshipPublishService extends AbstractService<Sponsor, S
 	@Override
 	public void validate(final Sponsorship object) {
 		assert object != null;
-		super.state(this.repository.allInvoicesPublishedBySponsorshipId(object.getId()), "*", "sponsor.sponsorship.form.error.publish-invoices");
-		if (!super.getBuffer().getErrors().hasErrors("code"))
-			super.state(this.repository.existsOtherByCodeAndId(object.getCode(), object.getId()), "code", "sponsor.sponsorship.form.error.duplicated");
+
+		if (!super.getBuffer().getErrors().hasErrors()) {
+			super.state(!this.repository.noneInvoicesBySponsorshipId(object.getId()), "*", "sponsor.sponsorship.form.error.none-invoices");
+			super.state(this.repository.allInvoicesPublishedBySponsorshipId(object.getId()), "*", "sponsor.sponsorship.form.error.publish-invoices");
+		}
+
+		if (!super.getBuffer().getErrors().hasErrors("code")) {
+			Sponsorship existing;
+			existing = this.repository.findOneSponsorshipByCode(object.getCode());
+
+			super.state(existing == null || existing.getId() == object.getId(), "code", "sponsor.sponsorship.form.error.duplicated");
+		}
 
 		if (!super.getBuffer().getErrors().hasErrors("startDate")) {
 			Date minimumDeadline;
 
-			if (!super.getBuffer().getErrors().hasErrors("moment")) {
-				super.state(MomentHelper.isAfterOrEqual(object.getStartDate(), object.getMoment()), "startDate", "sponsor.sponsorship.form.error.too-close-moment");
+			super.state(MomentHelper.isAfterOrEqual(object.getStartDate(), object.getMoment()), "startDate", "sponsor.sponsorship.form.error.too-close-moment");
 
-				minimumDeadline = object.getEndDate() == null ? null : MomentHelper.deltaFromMoment(object.getEndDate(), 1, ChronoUnit.MONTHS);
-				super.state(object.getEndDate() == null || MomentHelper.isBefore(object.getStartDate(), minimumDeadline), "startDate", "sponsor.sponsorship.form.error.duration-more-time");
-			} else
-				super.state(false, "startDate", "sponsor.sponsorship.form.error.invalid-moment");
-
+			minimumDeadline = object.getEndDate() == null ? null : MomentHelper.deltaFromMoment(object.getEndDate(), 1, ChronoUnit.MONTHS);
+			super.state(object.getEndDate() == null || MomentHelper.isBefore(object.getStartDate(), minimumDeadline), "startDate", "sponsor.sponsorship.form.error.duration-more-time");
 		}
 
 		if (!super.getBuffer().getErrors().hasErrors("endDate")) {
 			Date maximumDeadline;
 
-			if (!super.getBuffer().getErrors().hasErrors("moment")) {
-				super.state(MomentHelper.isAfterOrEqual(object.getEndDate(), object.getMoment()), "endDate", "sponsor.sponsorship.form.error.too-close-moment");
+			super.state(MomentHelper.isAfterOrEqual(object.getEndDate(), object.getMoment()), "endDate", "sponsor.sponsorship.form.error.too-close-moment");
 
-				maximumDeadline = object.getStartDate() == null ? null : MomentHelper.deltaFromMoment(object.getStartDate(), 1, ChronoUnit.MONTHS);
-				super.state(object.getStartDate() == null || MomentHelper.isAfter(object.getEndDate(), maximumDeadline), "endDate", "sponsor.sponsorship.form.error.duration-more-time");
-			} else
-				super.state(false, "endDate", "sponsor.sponsorship.form.error.invalid-moment");
+			maximumDeadline = object.getStartDate() == null ? null : MomentHelper.deltaFromMoment(object.getStartDate(), 1, ChronoUnit.MONTHS);
+			super.state(object.getStartDate() == null || MomentHelper.isAfter(object.getEndDate(), maximumDeadline), "endDate", "sponsor.sponsorship.form.error.duration-more-time");
 		}
 
-		if (!super.getBuffer().getErrors().hasErrors("project")) {
-			Boolean isDraftMode = this.repository.projectIsDraftMode(object.getProject().getId());
-			super.state(!isDraftMode, "project", "sponsor.sponsorship.form.error.not-published-project");
-		}
+		Collection<Invoice> invoices = this.repository.findManyInvoicesBySponsorshipId(object.getId());
+		double sumTotal = 0.0;
+		if (object.getAmount() != null) {
+			String systemCurrency;
+			for (Invoice i : invoices) {
+				systemCurrency = this.repository.findSystemConfiguration().getSystemCurrency();
+				sumTotal += i.totalAmount().getAmount() * this.repository.findMoneyConvertByMoneyCurrency(systemCurrency);
+			}
 
+			double factor = Math.pow(10, 2);
+			sumTotal = Math.round(sumTotal * factor) / factor;
+		} else
+			sumTotal = -10000.00;
+
+		if (!super.getBuffer().getErrors().hasErrors("amount")) {
+			Money amount;
+			boolean bool;
+			amount = object.getAmount();
+			bool = amount.getCurrency().equals("EUR") || amount.getCurrency().equals("USD") || amount.getCurrency().equals("GBP");
+
+			super.state(amount.getAmount() >= 0, "amount", "sponsor.sponsorship.form.error.negative-amount");
+			super.state(bool, "amount", "sponsor.sponsorship.form.error.wrong-currency");
+			if (bool)
+				super.state(amount.getAmount() * this.repository.findMoneyConvertByMoneyCurrency(amount.getCurrency()) == sumTotal, "amount", "sponsor.sponsorship.form.error.invoices-amount");
+		}
 	}
 
 	@Override
 	public void perform(final Sponsorship object) {
 		assert object != null;
-
-		Double invoicesAmounts;
-		Money finalMoney;
-		String systemCurrency;
-
-		invoicesAmounts = this.repository.findManyInvoicesBySponsorshipId(object.getId()).stream() //
-			.mapToDouble(i -> i.totalAmount().getAmount() / this.repository.findMoneyConvertByMoneyCurrency(i.totalAmount().getCurrency())) //
-			.sum();
-
-		systemCurrency = this.repository.findSystemConfiguration().getSystemCurrency();
-
-		finalMoney = new Money();
-		finalMoney.setAmount(Math.round(invoicesAmounts * this.repository.findMoneyConvertByMoneyCurrency(systemCurrency) * 100.0) / 100.0);
-		finalMoney.setCurrency(this.repository.findSystemConfiguration().getSystemCurrency());
-
-		object.setAmount(finalMoney);
 		object.setDraftMode(false);
 
 		this.repository.save(object);
@@ -140,7 +147,7 @@ public class SponsorSponsorshipPublishService extends AbstractService<Sponsor, S
 		SelectChoices choicesType;
 		Dataset dataset;
 
-		projects = this.repository.findAllProjects();
+		projects = this.repository.findAllPublishedProjects();
 		choices = SelectChoices.from(projects, "code", object.getProject());
 		choicesType = SelectChoices.from(TypeOfSponsorship.class, object.getType());
 

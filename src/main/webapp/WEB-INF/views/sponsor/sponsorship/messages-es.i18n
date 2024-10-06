@@ -36,7 +36,6 @@ sponsor.sponsorship.form.button.delete = Borrar
 sponsor.sponsorship.form.button.publish = Publicar
 sponsor.sponsorship.form.button.create = Crear
 
-
 sponsor.sponsorship.form.error.duplicated = Este código ya estña cogido
 sponsor.sponsorship.form.error.bad-money = La suma de la cantidad total de todas las facturas debe ser igual a la cantidad del patrocinio
 sponsor.sponsorship.form.error.publish-invoices = Antes de publicar un patrocinio, primero debes publicar sus facturas
@@ -44,3 +43,8 @@ sponsor.sponsorship.form.error.too-close-moment = Esta fecha debe ser después a
 sponsor.sponsorship.form.error.not-published-project = No puedes crear un patrocinio de un proyecto no publicado
 sponsor.sponsorship.form.error.duration-more-time = La fecha de inicio debe ser al menos un mes antes de la fecha de fin
 sponsor.sponsorship.form.error.invalid-moment = La fecha de momento es incorrecto
+sponsor.sponsorship.form.error.negative-amount = La cantidad debe ser positiva
+sponsor.sponsorship.form.error.wrong-currency = La moneda debe ser EUR, USD o GBP
+sponsor.sponsorship.form.error.invoices-amount = La cantidad debe ser igual a la suma de las cantidades totales de las facturas relacionadas
+sponsor.sponsorship.form.error.different-currency = No puedes cambiar la moneda de un patrocinio
+sponsor.sponsorship.form.error.none-invoices = No hay ninguna factura creada. Por favor, crea uno y publicalo antes de publicar el patrocinio

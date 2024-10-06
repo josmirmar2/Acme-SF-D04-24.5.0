@@ -43,4 +43,8 @@ sponsor.sponsorship.form.error.too-close-moment = This date must be after the da
 sponsor.sponsorship.form.error.not-published-project = You cannot make a sponsorship from a non published project
 sponsor.sponsorship.form.error.duration-more-time = The start date must be at least one month before the end date
 sponsor.sponsorship.form.error.invalid-moment = The moment date is incorrect
-
+sponsor.sponsorship.form.error.negative-amount = Amount must be positive
+sponsor.sponsorship.form.error.wrong-currency = The currency must be EUR, USD or GBP
+sponsor.sponsorship.form.error.invoices-amount = Amount must be equal to the sum of the total amount of the related invoice
+sponsor.sponsorship.form.error.different-currency = You can't change the sponsorship's currency
+sponsor.sponsorship.form.error.none-invoices = There is no invoice created. Please create one and publish it before publishing the sponsorship

@@ -71,32 +71,37 @@ public class SponsorSponsorshipUpdateService extends AbstractService<Sponsor, Sp
 	@Override
 	public void validate(final Sponsorship object) {
 		assert object != null;
-		if (!super.getBuffer().getErrors().hasErrors("code"))
-			super.state(this.repository.existsOtherByCodeAndId(object.getCode(), object.getId()), "code", "sponsor.sponsorship.form.error.duplicated");
+		if (!super.getBuffer().getErrors().hasErrors("code")) {
+			Sponsorship existing;
+			existing = this.repository.findOneSponsorshipByCode(object.getCode());
+
+			super.state(existing == null || existing.getId() == object.getId(), "code", "sponsor.sponsorship.form.error.duplicated");
+		}
 
 		if (!super.getBuffer().getErrors().hasErrors("startDate")) {
 			Date minimumDeadline;
 
-			if (!super.getBuffer().getErrors().hasErrors("moment")) {
-				super.state(MomentHelper.isAfterOrEqual(object.getStartDate(), object.getMoment()), "startDate", "sponsor.sponsorship.form.error.too-close-moment");
+			super.state(MomentHelper.isAfterOrEqual(object.getStartDate(), object.getMoment()), "startDate", "sponsor.sponsorship.form.error.too-close-moment");
 
-				minimumDeadline = object.getEndDate() == null ? null : MomentHelper.deltaFromMoment(object.getEndDate(), 1, ChronoUnit.MONTHS);
-				super.state(object.getEndDate() == null || MomentHelper.isBefore(object.getStartDate(), minimumDeadline), "startDate", "sponsor.sponsorship.form.error.duration-more-time");
-			} else
-				super.state(false, "startDate", "sponsor.sponsorship.form.error.invalid-moment");
-
+			minimumDeadline = object.getEndDate() == null ? null : MomentHelper.deltaFromMoment(object.getEndDate(), 1, ChronoUnit.MONTHS);
+			super.state(object.getEndDate() == null || MomentHelper.isBefore(object.getStartDate(), minimumDeadline), "startDate", "sponsor.sponsorship.form.error.duration-more-time");
 		}
 
 		if (!super.getBuffer().getErrors().hasErrors("endDate")) {
 			Date maximumDeadline;
 
-			if (!super.getBuffer().getErrors().hasErrors("moment")) {
-				super.state(MomentHelper.isAfterOrEqual(object.getEndDate(), object.getMoment()), "endDate", "sponsor.sponsorship.form.error.too-close-moment");
+			super.state(MomentHelper.isAfterOrEqual(object.getEndDate(), object.getMoment()), "endDate", "sponsor.sponsorship.form.error.too-close-moment");
 
-				maximumDeadline = object.getStartDate() == null ? null : MomentHelper.deltaFromMoment(object.getStartDate(), 1, ChronoUnit.MONTHS);
-				super.state(object.getStartDate() == null || MomentHelper.isAfter(object.getEndDate(), maximumDeadline), "endDate", "sponsor.sponsorship.form.error.duration-more-time");
-			} else
-				super.state(false, "endDate", "sponsor.sponsorship.form.error.invalid-moment");
+			maximumDeadline = object.getStartDate() == null ? null : MomentHelper.deltaFromMoment(object.getStartDate(), 1, ChronoUnit.MONTHS);
+			super.state(object.getStartDate() == null || MomentHelper.isAfter(object.getEndDate(), maximumDeadline), "endDate", "sponsor.sponsorship.form.error.duration-more-time");
+		}
+
+		if (!super.getBuffer().getErrors().hasErrors("amount")) {
+			Money amount;
+			amount = object.getAmount();
+
+			super.state(amount.getAmount() >= 0, "amount", "sponsor.sponsorship.form.error.negative-amount");
+			super.state(amount.getCurrency().equals("EUR") || amount.getCurrency().equals("USD") || amount.getCurrency().equals("GBP"), "amount", "sponsor.sponsorship.form.error.wrong-currency");
 		}
 
 	}
@@ -104,22 +109,6 @@ public class SponsorSponsorshipUpdateService extends AbstractService<Sponsor, Sp
 	@Override
 	public void perform(final Sponsorship object) {
 		assert object != null;
-
-		Double invoicesAmounts;
-		Money finalMoney;
-		String systemCurrency;
-
-		invoicesAmounts = this.repository.findManyInvoicesBySponsorshipId(object.getId()).stream() //
-			.mapToDouble(i -> i.totalAmount().getAmount() / this.repository.findMoneyConvertByMoneyCurrency(i.totalAmount().getCurrency())) //
-			.sum();
-
-		systemCurrency = this.repository.findSystemConfiguration().getSystemCurrency();
-
-		finalMoney = new Money();
-		finalMoney.setAmount(Math.round(invoicesAmounts * this.repository.findMoneyConvertByMoneyCurrency(systemCurrency) * 100.0) / 100.0);
-		finalMoney.setCurrency(this.repository.findSystemConfiguration().getSystemCurrency());
-
-		object.setAmount(finalMoney);
 
 		this.repository.save(object);
 	}
@@ -133,7 +122,7 @@ public class SponsorSponsorshipUpdateService extends AbstractService<Sponsor, Sp
 		SelectChoices choicesType;
 		Dataset dataset;
 
-		projects = this.repository.findAllProjects();
+		projects = this.repository.findAllPublishedProjects();
 		choices = SelectChoices.from(projects, "code", object.getProject());
 		choicesType = SelectChoices.from(TypeOfSponsorship.class, object.getType());
 
