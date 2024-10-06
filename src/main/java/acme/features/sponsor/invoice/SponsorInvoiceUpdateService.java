@@ -2,7 +2,6 @@
 package acme.features.sponsor.invoice;
 
 import java.time.temporal.ChronoUnit;
-import java.util.Collection;
 import java.util.Date;
 
 import org.assertj.core.util.Arrays;
@@ -74,19 +73,8 @@ public class SponsorInvoiceUpdateService extends AbstractService<Sponsor, Invoic
 		}
 
 		if (!super.getBuffer().getErrors().hasErrors("quantity")) {
-			double before;
-			double res;
-			Collection<Invoice> invoices;
-
-			invoices = this.repository.findManyInvoicesBySponsorshipId(object.getSponsorship().getId());
-			before = this.repository.findOneInvoiceById(object.getId()).totalAmount().getAmount();
-			res = object.totalAmount().getAmount() - before;
-			for (Invoice i : invoices)
-				res += i.totalAmount().getAmount();
-
 			super.state(object.getQuantity().getAmount() > 0, "quantity", "sponsor.invoice.form.error.negative-salary");
 			super.state(Arrays.asList(this.repository.findAcceptedCurrencies().split(",")).contains(object.getQuantity().getCurrency()), "quantity", "sponsor.invoice.form.error.invalid-currency");
-			super.state(res <= object.getSponsorship().getAmount().getAmount(), "quantity", "sponsor.invoice.form.error.bad-total-amount");
 		}
 	}
 
