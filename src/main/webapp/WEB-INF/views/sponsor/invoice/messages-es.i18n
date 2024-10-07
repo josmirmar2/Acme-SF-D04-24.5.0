@@ -31,10 +31,10 @@ sponsor.invoice.form.button.delete = Eliminar
 sponsor.invoice.form.button.publish = Publicar
 sponsor.invoice.form.button.create = Crear
 
-sponsor.invoice.form.error.duplicated = Este código no está libre
-sponsor.invoice.form.error.negative-salary = La cantidad debe ser positiva
-sponsor.invoice.form.error.invalid-currency = Por favor, elige un tipo de moneda que esté en la configuración del sistema
-sponsor.invoice.form.error.to-close-from-registration = La fecha de vencimiento debe ser al menos un mes por delante del momento de inscripción
-sponsor.invoice.form.error.incorrect-registration-time = El momento de inscripción es incorrecto. Por favor, corrígelo para poder rellenar correctamente la fecha de vencimiento
-sponsor.invoice.form.error.bad-total-amount = A la hora de publicar una factura, la cantidad total de esta debe no ser superior a la del patrocinio al que pertenece
+sponsor.invoice.form.error.duplicated = Este código ya está tomado. Elige otro.
+sponsor.invoice.form.error.negative-salary = La cantidad debe ser positiva.
+sponsor.invoice.form.error.invalid-currency = Elija una moneda que esté en la configuración del sistema. Debe ser EUR, USD o GBP.
+sponsor.invoice.form.error.to-close-from-registration = La fecha de vencimiento debe ser al menos un mes anterior al momento de inscripción.
+sponsor.invoice.form.error.incorrect-registration-time = La hora de inscripción es incorrecta. Por favor, corríjala para que el valor de la fecha límite se pueda completar correctamente.
+sponsor.invoice.form.error.bad-total-amount = Al publicar una factura, el importe total de la misma no debe ser mayor al del patrocinio al que pertenece.
 
